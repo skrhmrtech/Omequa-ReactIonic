@@ -1,0 +1,16 @@
+.landing-page {
+    background: linear-gradient(#d6ecff, #fff, #d6ecff);
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.landing-logo {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 50px;
+}
+
+/* Fade Out Animation */
+.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}

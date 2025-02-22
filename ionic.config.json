@@ -1,0 +1,7 @@
+{
+  "name": "Omequa",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

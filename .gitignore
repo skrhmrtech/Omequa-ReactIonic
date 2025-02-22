@@ -1,0 +1,66 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules/
+/.pnp/
+/.pnp.js
+
+# environment variables
+.env
+.env.*.local
+
+# build artifacts
+/build/
+/dist/
+/out/
+/coverage/
+
+# next.js specific (if using Next.js)
+/.next/
+/.vercel/
+/.vscode/*
+
+# cache & logs
+.npm/
+.yarn/
+.yarn-cache/
+.yarn-error.log
+.pnp.loader.mjs
+.nx/
+.nx/cache/
+.eslintcache
+/.turbo/
+.docusaurus/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDEs and Editors
+.idea/
+.vscode/*
+!/.vscode/extensions.json
+/.vscode/tasks.json
+/.vscode/launch.json
+/.vscode/settings.json
+/.vscode/*.code-workspace
+*.iml
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Capacitor / Ionic specific files
+/android/app/build/
+/ios/App/App.xcworkspace/
+/ios/Pods/
+/ios/build/
+/platforms/
+/plugins/
+/www/
+android/gradle-8.5-bin.zip

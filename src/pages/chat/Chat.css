@@ -1,0 +1,16 @@
+.chat-message {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  text-wrap: wrap !important;
+  max-width: 100%;
+}
+
+#chat-input-box {
+  --inner-padding-end: 5px;
+}
+
+/* Custom Scrollbar for the Chat Messages */
+::-webkit-scrollbar {
+  width: 0px;
+}
