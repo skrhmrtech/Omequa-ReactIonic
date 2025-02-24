@@ -43,8 +43,8 @@ const Home: React.FC = () => {
       gender: Yup.string().required('Please select a gender'),
     }),
     validateOnChange: true,
-    onSubmit: (values) => {
-      history.push('/chat')
+    onSubmit: (state) => {
+      history.push({ pathname: '/chat', state })
     },
   });
 

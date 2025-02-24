@@ -7,7 +7,7 @@ import {
     IonRow,
     IonCol,
 } from '@ionic/react';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 
@@ -23,6 +23,8 @@ import Input from '../../components/input/Input';
 
 import './Chat.css';
 
+const SOCKET_URL = "ws://api.omequa.com/chat";
+
 const Chat: React.FC = () => {
     const history = useHistory();
     const chatEndRef = useRef<HTMLDivElement>(null);
@@ -31,27 +33,48 @@ const Chat: React.FC = () => {
     const [chatActive, setChatActive] = useState(false);
     const [userLeave, setUserLeave] = useState(false);
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState<Array<Message>>([
-        { sender: 1, text: "Hello 👋" },
-        { text: "Hello 👋 \nHow are you?" },
-        { sender: 1, text: "I am fine and you?" },
-        { text: "I'm good too! 😊 What are you up to?" },
-        { sender: 1, text: "Just working on a project. How about you?" },
-        { text: "Same here! Trying to finish some tasks. 🚀" },
-        { sender: 1, text: "Nice! Keep going 💪" },
-        { text: "Thanks! By the way, what kind of project are you working on?" },
-    ]);
+    const [messages, setMessages] = useState<Array<Message>>([]);
+
+    const location = useLocation<{ secretCode: string; fullName: string; gender: string }>();
+    const { secretCode, fullName, gender } = location?.state || {};
+
+    const ws = useRef<WebSocket | null>(null);
+
+    useEffect(() => {
+        if (!secretCode || !fullName || !gender) {
+            history.replace('/');
+            return;
+        }
+
+        // Initialize WebSocket connection
+        const connectWebSocket = () => {
+            ws.current = new WebSocket(`${SOCKET_URL}?secretCode=${secretCode}&fullName=${fullName}&gender=${gender}`);
+
+            ws.current.onopen = () => {
+                setChatActive(true);
+                setUserLeave(false);
+                setMessages([]);
+            };
+
+            ws.current.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === "text") {
+                    setMessages((prevMessages) => [...prevMessages, { text: data.message, sender: 1 }]);
+                }
+            };
+
+            ws.current.onclose = () => {
+                setChatActive(false);
+                setUserLeave(true)
+            };
+        };
+
+        connectWebSocket();
+    }, [secretCode, fullName, gender]);
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
-
-    useEffect(() => {
-        if (chatActive && !userLeave) {
-            const timer = setTimeout(() => setUserLeave(true), 1000 * 60);
-            return () => clearTimeout(timer);
-        }
-    }, [chatActive, messages]);
 
     useEffect(() => {
         if (Capacitor.isNativePlatform()) {
@@ -62,9 +85,14 @@ const Chat: React.FC = () => {
 
     const sendMessage = (msg = message) => {
         if (!msg.trim()) return
-        setMessages([...messages, { text: msg }]);
-        setMessage('');
-    }
+
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'text', message: msg }));
+
+            setMessages([...messages, { text: msg }]);
+            setMessage('');
+        }
+    };
 
     return (
         <IonPage>
@@ -72,7 +100,7 @@ const Chat: React.FC = () => {
                 <IonGrid className="w-full h-full flex justify-center" style={{ height: `calc(100vh - ${keyboardOpen}px)` }}>
                     <IonRow className="w-full max-w-md px-5 flex flex-col h-full">
                         <div className="h-[10%] flex items-end pb-2">
-                            <Header title='Yuvraj' isBack={true} />
+                            <Header title='User' isBack={true} />
                         </div>
 
                         {/* Form Section */}
@@ -84,7 +112,7 @@ const Chat: React.FC = () => {
                                             <div className="bg-[#fff6f2] shadow-lg shadow-[#ffc6b2] rounded-full m-5 px-5 py-3 border-2 border-[#ff4a0a] border-b-0">
                                                 <PiLinkBreakBold className="text-[#ff4a0a] text-5xl " />
                                             </div>
-                                            <p className="text-[#ff4a0a] mb-3 font-semibold">Yuvraj is Disconnected</p>
+                                            <p className="text-[#ff4a0a] mb-3 font-semibold">User is Disconnected</p>
                                         </div>
 
                                         {/* Investor Section */}
@@ -113,7 +141,7 @@ const Chat: React.FC = () => {
                                             </span>
                                         </div>
                                     ) : (
-                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Connected to Yuvraj</p>
+                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Connected to User</p>
                                     )
                                 }
                             </div>
