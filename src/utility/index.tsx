@@ -1,5 +1,28 @@
 import toast from "react-hot-toast";
 
+// Function to generate a Secret Code
+export const generateSecretCode = () => {
+    const storedCode = localStorage.getItem("SecretCode");
+    const storedTimestamp = localStorage.getItem("SecretCodeTimestamp");
+
+    // Get today's 7 AM timestamp
+    const today7AM = new Date();
+    today7AM.setHours(7, 0, 0, 0);
+    const today7AMTimestamp = today7AM.getTime();
+
+    // If timestamp exists and it's still the same day before 7 AM, return existing code
+    if (storedCode && storedTimestamp && Number(storedTimestamp) >= today7AMTimestamp) {
+        return storedCode;
+    }
+
+    // Generate a new secret code
+    const newCode = generateRandomCode();
+    localStorage.setItem("SecretCode", newCode);
+    localStorage.setItem("SecretCodeTimestamp", new Date().getTime().toString());
+
+    return newCode;
+};
+
 // Function to generate a random alphanumeric code of given length
 export const generateRandomCode = (length = 15): string => {
     const selectedString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

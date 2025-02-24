@@ -53,7 +53,6 @@ const Chat: React.FC = () => {
             ws.current.onopen = () => {
                 setChatActive(true);
                 setUserLeave(false);
-                setMessages([]);
             };
 
             ws.current.onmessage = (event) => {
@@ -70,6 +69,10 @@ const Chat: React.FC = () => {
         };
 
         connectWebSocket();
+
+        return () => {
+            ws.current?.close();
+        }
     }, [secretCode, fullName, gender]);
 
     useEffect(() => {

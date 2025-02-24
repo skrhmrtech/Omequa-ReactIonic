@@ -16,7 +16,7 @@ import { GiCheckMark } from "react-icons/gi";
 import { useHistory } from 'react-router';
 
 import Input from '../../components/input/Input';
-import { copyToClipboard, generateRandomCode } from '../../utility';
+import { copyToClipboard, generateSecretCode } from '../../utility';
 
 import FemaleImage from "../../assets/home/Female.jpg";
 import MaleImage from "../../assets/home/Male.jpg";
@@ -29,7 +29,7 @@ const Home: React.FC = () => {
   // Formik for handling form state and validation
   const formik = useFormik({
     initialValues: {
-      secretCode: generateRandomCode(),
+      secretCode: generateSecretCode(),
       fullName: '',
       gender: '',
     },
