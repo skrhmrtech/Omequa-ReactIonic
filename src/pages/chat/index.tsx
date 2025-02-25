@@ -20,6 +20,7 @@ import Header from '../../components/header';
 import Messages from '../../components/common/Messages';
 import Investors from '../../components/common/Investors';
 import Input from '../../components/input/Input';
+import TypingIndicator from '../../components/common/TypingIndicator';
 
 import './Chat.css';
 
@@ -32,8 +33,10 @@ const Chat: React.FC = () => {
 
     const [chatActive, setChatActive] = useState(false);
     const [userLeave, setUserLeave] = useState(false);
+    const [userName, setUserName] = useState(null);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState<Array<Message>>([]);
+    const [isTyping, setIsTyping] = useState(false);
 
     const location = useLocation<{ secretCode: string; fullName: string; gender: string }>();
     const { secretCode, fullName, gender } = location?.state || {};
@@ -51,13 +54,27 @@ const Chat: React.FC = () => {
             ws.current = new WebSocket(`${SOCKET_URL}?secretCode=${secretCode}&fullName=${fullName}&gender=${gender}`);
 
             ws.current.onopen = () => {
+                setUserName(null);
                 setChatActive(true);
                 setUserLeave(false);
+                setMessages([]);
             };
 
             ws.current.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === "text") {
+                    if (`${data.message}`.startsWith("{") && `${data.message}`.endsWith("}")) {
+                        const jsonObj = JSON.parse(`${data.message}`);
+
+                        if (jsonObj?.fullName) setUserName(jsonObj.fullName);
+                        if (Object.hasOwn(jsonObj, 'isTyping')) {
+                            setIsTyping(jsonObj.isTyping);
+                            return;
+                        }
+
+                        setMessages((prevMessages) => [...prevMessages, { text: jsonObj.text, sender: 1 }]);
+                        return
+                    }
                     setMessages((prevMessages) => [...prevMessages, { text: data.message, sender: 1 }]);
                 }
             };
@@ -90,10 +107,16 @@ const Chat: React.FC = () => {
         if (!msg.trim()) return
 
         if (ws.current?.readyState === WebSocket.OPEN) {
-            ws.current.send(JSON.stringify({ type: 'text', message: msg }));
+            ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: msg, fullName }) }));
 
             setMessages([...messages, { text: msg }]);
             setMessage('');
+        }
+    };
+
+    const sendTypingEvent = (isTyping: boolean) => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, isTyping }) }));
         }
     };
 
@@ -103,19 +126,19 @@ const Chat: React.FC = () => {
                 <IonGrid className="w-full h-full flex justify-center" style={{ height: `calc(100vh - ${keyboardOpen}px)` }}>
                     <IonRow className="w-full max-w-md px-5 flex flex-col h-full">
                         <div className="h-[10%] flex items-end pb-2">
-                            <Header title='User' isBack={true} />
+                            <Header title={userName ?? "User"} isBack={true} />
                         </div>
 
                         {/* Form Section */}
                         <IonCol className="flex-grow overflow-y-auto select-text">
                             {
-                                userLeave ? (
+                                userName && userLeave ? (
                                     <div className='h-full flex flex-col justify-center items-center'>
                                         <div className="text-center mb-5 flex flex-col items-center">
                                             <div className="bg-[#fff6f2] shadow-lg shadow-[#ffc6b2] rounded-full m-5 px-5 py-3 border-2 border-[#ff4a0a] border-b-0">
                                                 <PiLinkBreakBold className="text-[#ff4a0a] text-5xl " />
                                             </div>
-                                            <p className="text-[#ff4a0a] mb-3 font-semibold">User is Disconnected</p>
+                                            <p className="text-[#ff4a0a] mb-3 font-semibold">{userName ?? "User"} is Disconnected</p>
                                         </div>
 
                                         {/* Investor Section */}
@@ -125,6 +148,7 @@ const Chat: React.FC = () => {
                                     <div className='mt-3 p-1'>
                                         {chatActive && <Messages messages={messages} />}
                                         <div ref={chatEndRef} />
+                                        {isTyping && <TypingIndicator />}
                                     </div>
                                 )
                             }
@@ -134,24 +158,26 @@ const Chat: React.FC = () => {
                         <div className={`h-[${!userLeave && chatActive ? '22.5%' : '12.5%'}] flex flex-col justify-start pt-2`} >
                             <div className='w-full text-center mb-2'>
                                 {
-                                    userLeave ? (
+                                    userName && userLeave ? (
                                         <span className="text-[#0f5999] text-sm bg-[#edf6ff] p-2 rounded-md cursor-pointer" onClick={() => { history.replace('/') }}>Go to Home</span>
-                                    ) : chatActive ? (
+                                    ) : chatActive && messages.length && userName ? (
                                         <div className='w-[50%] mx-auto'>
                                             <span className='text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-2 justify-center items-center cursor-pointer' onClick={() => { }}>
                                                 <LuUpload className='text-xl' />
                                                 Upload Photo
                                             </span>
                                         </div>
-                                    ) : (
-                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Connected to User</p>
+                                    ) : userName ? (
+                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Connected to {userName ?? "User"}</p>
+                                    ) : (!messages.length || !userName) && (
+                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Waiting for connection</p>
                                     )
                                 }
                             </div>
 
                             <div className='flex w-full'>
                                 <div className='w-1/2 p-1'>
-                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#68b2ff] text-white text-lg' onClick={() => { !userLeave && setChatActive(true) }}>
+                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#68b2ff] text-white text-lg' onClick={() => { !userLeave && messages.length && setChatActive(true) }}>
                                         New Chat
                                     </IonButton>
                                 </div>
@@ -174,6 +200,8 @@ const Chat: React.FC = () => {
                                             onKeyDown={(e) => {
                                                 if (e.keyCode === 13) sendMessage(e.currentTarget.value);
                                             }}
+                                            onFocus={() => sendTypingEvent(true)}
+                                            onBlur={() => sendTypingEvent(false)}
                                             slots={(
                                                 <IonButton size='small' fill="clear" slot="end" className='bg-[#68b2ff] my-1 rounded-lg text-white hover:text-black hover:transition duration-300' onClick={() => sendMessage(message)}>
                                                     <RiSendPlaneFill className="text-3xl m-2" />

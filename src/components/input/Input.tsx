@@ -10,6 +10,7 @@ function Input({
     labelCss = "",
     inputCss = "",
     onIonChange,
+    onFocus,
     onBlur,
     onKeyDown,
     readOnly = false,
@@ -23,6 +24,7 @@ function Input({
     labelCss?: string
     inputCss?: string
     onIonChange: (e: any) => void,
+    onFocus?: (e: any) => void,
     onBlur?: (e: any) => void,
     onKeyDown?: (e: any) => void,
     readOnly?: boolean,
@@ -37,6 +39,7 @@ function Input({
                     placeholder={placeholder}
                     value={value}
                     onIonChange={onIonChange}
+                    onFocus={onFocus}
                     onBlur={onBlur}
                     onKeyDown={onKeyDown}
                     readonly={readOnly}
