@@ -5,7 +5,7 @@ function Investors() {
                 Do you want to connect with an investor?
             </p>
             <p className="text-blue-400 mb-3">Pay just $2 for 24 hours</p>
-            <a className="text-[#4dacff] font-semibold text-xl" href="#">
+            <a className="text-[#4dacff] font-semibold text-xl cursor-pointer" title="Pay Now">
                 Pay Now
             </a>
         </div>
