@@ -38,6 +38,8 @@ const Chat: React.FC = () => {
     const [messages, setMessages] = useState<Array<Message>>([]);
     const [isTyping, setIsTyping] = useState(false);
 
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     const location = useLocation<{ secretCode: string; fullName: string; gender: string }>();
     const { secretCode, fullName, gender } = location?.state || {};
 
@@ -69,6 +71,10 @@ const Chat: React.FC = () => {
                         if (jsonObj?.fullName) setUserName(jsonObj.fullName);
                         if (Object.hasOwn(jsonObj, 'isTyping')) {
                             setIsTyping(jsonObj.isTyping);
+
+                            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                            if (jsonObj.isTyping) typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+
                             return;
                         }
 
@@ -94,7 +100,7 @@ const Chat: React.FC = () => {
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    }, [messages, isTyping]);
 
     useEffect(() => {
         if (Capacitor.isNativePlatform()) {
@@ -119,6 +125,14 @@ const Chat: React.FC = () => {
             ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, isTyping }) }));
         }
     };
+
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <IonPage>
@@ -196,12 +210,14 @@ const Chat: React.FC = () => {
                                             itemId='chat-input-box'
                                             placeholder='Enter message...'
                                             value={message}
-                                            onIonChange={(e) => setMessage(e.target.value)}
+                                            onIonChange={(e) => {
+                                                setMessage(e.target.value)
+                                                sendTypingEvent(true)
+                                            }}
                                             onKeyDown={(e) => {
                                                 if (e.keyCode === 13) sendMessage(e.currentTarget.value);
+                                                else sendTypingEvent(true);
                                             }}
-                                            onFocus={() => sendTypingEvent(true)}
-                                            onBlur={() => sendTypingEvent(false)}
                                             slots={(
                                                 <IonButton size='small' fill="clear" slot="end" className='bg-[#68b2ff] my-1 rounded-lg text-white hover:text-black hover:transition duration-300' onClick={() => sendMessage(message)}>
                                                     <RiSendPlaneFill className="text-3xl m-2" />
