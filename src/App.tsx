@@ -1,3 +1,4 @@
+import React from 'react';
 import { Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -40,6 +41,10 @@ import { Toaster } from 'react-hot-toast';
 setupIonicReact();
 
 const App: React.FC = () => {
+
+  // Set the global title
+  React.useEffect(() => { document.title = "Omequa" }, []);
+
   return (
     <IonApp>
       <Toaster position="top-center" />
