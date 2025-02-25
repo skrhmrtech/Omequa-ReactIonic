@@ -24,7 +24,7 @@ import TypingIndicator from '../../components/common/TypingIndicator';
 
 import './Chat.css';
 
-const SOCKET_URL = "ws://api.omequa.com/chat";
+const SOCKET_URL = "wss://api.omequa.com/chat";
 
 const Chat: React.FC = () => {
     const history = useHistory();
