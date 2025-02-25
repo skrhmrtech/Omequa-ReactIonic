@@ -48,7 +48,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, m
     };
 
     return (
-        <>
+        <React.Fragment>
             {/* Hidden file input */}
             <input
                 type="file"
@@ -60,13 +60,13 @@ const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, m
 
             {/* Upload Button */}
             <span
-                className='text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-2 justify-center items-center cursor-pointer'
+                className='w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-2 justify-center items-center cursor-pointer'
                 onClick={() => fileInputRef.current?.click()}
             >
                 <LuUpload className='text-xl' />
                 Upload Photo
             </span>
-        </>
+        </React.Fragment>
     );
 };
 

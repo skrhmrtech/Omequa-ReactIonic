@@ -23,6 +23,7 @@ import TypingIndicator from '../../components/common/TypingIndicator';
 import UploadFiles from '../../components/common/UploadFiles';
 
 import './Chat.css';
+import { generateRandomCode } from '../../utility';
 
 const SOCKET_URL = "wss://api.omequa.com/chat";
 
@@ -70,6 +71,7 @@ const Chat: React.FC = () => {
                         const jsonObj = JSON.parse(`${data.message}`);
 
                         if (jsonObj?.fullName) setUserName(jsonObj.fullName);
+
                         if (Object.hasOwn(jsonObj, 'isTyping')) {
                             setIsTyping(jsonObj.isTyping);
 
@@ -79,7 +81,12 @@ const Chat: React.FC = () => {
                             return;
                         }
 
-                        setMessages((prevMessages) => [...prevMessages, { text: jsonObj.text, sender: 1 }]);
+                        if (jsonObj?.receiveImage && jsonObj?.id) {
+                            setMessages((prevM) => prevM.map((msg) => msg?.id === jsonObj?.id ? { ...msg, receiveImage: jsonObj.receiveImage } : msg));
+                            return
+                        }
+
+                        setMessages((prevMessages) => [...prevMessages, { ...jsonObj, sender: 1 }]);
                         return
                     }
                     setMessages((prevMessages) => [...prevMessages, { text: data.message, sender: 1 }]);
@@ -95,9 +102,7 @@ const Chat: React.FC = () => {
 
         connectWebSocket();
 
-        return () => {
-            ws.current?.close();
-        }
+        return () => ws.current?.close();
     }, [secretCode, fullName, gender]);
 
     useEffect(() => {
@@ -110,9 +115,7 @@ const Chat: React.FC = () => {
             Keyboard.addListener('keyboardDidHide', () => setKeyboardOpen(0));
         }
         return () => {
-            if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
-            }
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         };
     }, []);
 
@@ -138,7 +141,23 @@ const Chat: React.FC = () => {
             ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: image, fullName }) }));
 
             setMessages([...messages, { text: image }]);
-            setMessage('');
+        }
+    }
+
+    const requestForPhoto = () => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            const id = generateRandomCode();
+            ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: "photo_request", fullName, id }) }));
+
+            setMessages([...messages, { text: "photo_request", id }]);
+        }
+    }
+
+    const handleRequestedPhotoUpload = (image: string | null, id: string) => {
+        if (image && id && ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, receiveImage: image, id }) }));
+
+            setMessages((prevM) => prevM.map((msg) => msg?.id === id ? { ...msg, receiveImage: image } : msg));
         }
     }
 
@@ -168,7 +187,7 @@ const Chat: React.FC = () => {
                                     </div>
                                 ) : (
                                     <div className='mt-3 p-1'>
-                                        {chatActive && <Messages messages={messages} />}
+                                        {chatActive && <Messages messages={messages} handleFileUpload={handleRequestedPhotoUpload} />}
                                         <div ref={chatEndRef} />
                                         {isTyping && <TypingIndicator />}
                                     </div>
@@ -201,7 +220,7 @@ const Chat: React.FC = () => {
                                     </IonButton>
                                 </div>
                                 <div className={`w-full p-1 ${!inputBoxActive && 'hidden'}`}>
-                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#a943a0] text-white text-lg' onClick={() => { }}>
+                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#a943a0] text-white text-lg' onClick={requestForPhoto}>
                                         Req Photo
                                     </IonButton>
                                 </div>
