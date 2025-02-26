@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import toast from 'react-hot-toast';
-import { LuUpload } from "react-icons/lu";
+import LuUpload from "../../assets/chat/Upload.png";
 
 interface UploadFilesProps {
     allowedTypes?: string[];
@@ -60,10 +60,10 @@ const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, m
 
             {/* Upload Button */}
             <span
-                className='w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-2 justify-center items-center cursor-pointer'
+                className='w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-3 justify-center items-center cursor-pointer'
                 onClick={() => fileInputRef.current?.click()}
             >
-                <LuUpload className='text-xl' />
+                <img src={LuUpload} alt="" className='w-6' />
                 Upload Photo
             </span>
         </React.Fragment>

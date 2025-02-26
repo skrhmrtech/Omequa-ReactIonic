@@ -1,7 +1,7 @@
 import { useHistory } from "react-router";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { TbMessageCircleStar } from "react-icons/tb";
+import TbMessageCircleStar from "../../assets/home/Query.png";
 
 function Header({
     title,
@@ -20,7 +20,7 @@ function Header({
             </div>
             <div className='flex gap-4'>
                 <AiOutlineExclamationCircle className='text-2xl cursor-pointer' />
-                <TbMessageCircleStar className='text-2xl cursor-pointer' />
+                <img src={TbMessageCircleStar} alt="" className='w-6 cursor-pointer' />
             </div>
         </div>
     )

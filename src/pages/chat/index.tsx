@@ -11,8 +11,8 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 
-import { RiSendPlaneFill } from "react-icons/ri";
 import { PiLinkBreakBold } from "react-icons/pi";
+import RiSendPlaneFill from "../../assets/chat/Chat.png";
 
 import Investors from '../../components/common/Investors';
 import Messages from '../../components/common/Messages';
@@ -206,7 +206,7 @@ const Chat: React.FC = () => {
                                             onKeyDown={(e) => (e.keyCode === 13) ? sendMessage(e.currentTarget.value) : sendTypingEvent(true)}
                                             slots={(
                                                 <IonButton size='small' fill="clear" slot="end" className='bg-[#68b2ff] my-1 rounded-lg text-white hover:text-black hover:transition duration-300' onClick={() => sendMessage(message)}>
-                                                    <RiSendPlaneFill className="text-3xl m-2" />
+                                                    <img src={RiSendPlaneFill} alt="" className='w-8 my-1.5 mx-2.5' />
                                                 </IonButton>
                                             )}
                                         />
