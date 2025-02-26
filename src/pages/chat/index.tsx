@@ -17,7 +17,6 @@ import RiSendPlaneFill from "../../assets/chat/Chat.png";
 import Investors from '../../components/common/Investors';
 import Messages from '../../components/common/Messages';
 import TypingIndicator from '../../components/common/TypingIndicator';
-import UploadFiles from '../../components/common/UploadFiles';
 import Header from '../../components/header';
 import Input from '../../components/input/Input';
 import { generateRandomCode } from '../../utility';
@@ -42,17 +41,16 @@ const Chat: React.FC = () => {
     const [messages, setMessages] = useState<Array<Message>>([]);
     const [isTyping, setIsTyping] = useState(false);
 
-    useEffect(() => {
+    const connectWebSocket = () => {
         if (!secretCode || !fullName || !gender) return history.replace('/');
 
-        // Initialize WebSocket connection
-        const connectWebSocket = () => {
-            ws.current = new WebSocket(`${SOCKET_URL}?secretCode=${secretCode}&fullName=${fullName}&gender=${gender}`);
-            ws.current.onopen = () => handleConnectLeave(true);
-            ws.current.onmessage = (event) => handleMessage(event);
-            ws.current.onclose = () => handleConnectLeave(false);
-        };
+        ws.current = new WebSocket(`${SOCKET_URL}?secretCode=${secretCode}&fullName=${fullName}&gender=${gender}`);
+        ws.current.onopen = () => handleConnectLeave(true);
+        ws.current.onmessage = (event) => handleMessage(event);
+        ws.current.onclose = () => handleConnectLeave(false);
+    };
 
+    useEffect(() => {
         connectWebSocket();
         return () => ws.current?.close();
     }, [secretCode, fullName, gender]);
@@ -84,6 +82,7 @@ const Chat: React.FC = () => {
             if (jsonObj?.fullName) setUserName(jsonObj.fullName);
             if ('isTyping' in jsonObj) return handleTyping(jsonObj.isTyping);
             if (jsonObj?.receiveImage && jsonObj?.id) return updateImage(jsonObj.id, jsonObj.receiveImage);
+            if (jsonObj?.isConnectionLost) return handleConnectLeave(false);
 
             setMessages((prev) => [...prev, { ...jsonObj, sender: 1 }]);
         } catch {
@@ -101,7 +100,6 @@ const Chat: React.FC = () => {
         setMessages((prev) => prev.map((msg) => (msg?.id === id ? { ...msg, receiveImage: image } : msg)));
     };
 
-
     const sendMessage = (msg = message, args: Object = {}) => {
         if (!msg.trim() || ws.current?.readyState !== WebSocket.OPEN) return;
         ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: msg, fullName, ...args }) }));
@@ -109,19 +107,20 @@ const Chat: React.FC = () => {
         setMessage('');
     };
 
-    const sendTypingEvent = (isTyping: boolean) => {
-        if (ws.current?.readyState !== WebSocket.OPEN) return;
-        ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, isTyping }) }));
+    const sendSpecificMessage = (args: Object = {}, callback: (...params: any[]) => void = () => { }, ...callbackParams: any[]) => {
+        if (ws.current?.readyState !== WebSocket.OPEN) return false;
+        ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, ...args }) }));
+        callback(...callbackParams);
     };
 
-    const handleUploadImage = (image: string | null) => image && sendMessage(image);
+    const newConnection = () => sendSpecificMessage({ isConnectionLost: true }, connectWebSocket);
+
+    const sendTypingEvent = (isTyping: boolean) => sendSpecificMessage({ isTyping });
 
     const requestForPhoto = () => sendMessage("photo_request", { id: generateRandomCode() });
 
     const handleRequestedPhotoUpload = (image: string | null, id: string) => {
-        if (!(image && id && ws.current?.readyState === WebSocket.OPEN)) return;
-        ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, receiveImage: image, id }) }));
-        updateImage(id, image);
+        (image && id) && sendSpecificMessage({ receiveImage: image, id }, updateImage, id, image);
     }
 
     return (
@@ -162,26 +161,28 @@ const Chat: React.FC = () => {
                             <div className='w-full text-center mb-2'>
                                 {
                                     userName && userLeave ? (
-                                        <span className="text-[#0f5999] text-sm bg-[#edf6ff] p-2 rounded-md cursor-pointer" onClick={() => { history.replace('/') }}>Go to Home</span>
-                                    ) : (!messages.length && !userName) ? (
-                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">Waiting for connection</p>
+                                        <span className="text-[#0f5999] text-sm bg-[#edf6ff] p-2 rounded-md cursor-pointer font-bold" onClick={() => history.replace('/')}>Go to Home</span>
                                     ) : (
-                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">Connected to {userName ?? "User"}</p>
+                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">
+                                            {!messages.length && !userName ? 'Waiting for connection' : `Connected to ${userName ?? "User"}`}
+                                        </p>
                                     )
                                 }
                             </div>
 
                             <div className={`flex w-full`}>
-                                <div className={`w-full p-1 ${!userName && !messages.length && 'hidden'}`}>
-                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#68b2ff] text-white text-lg' onClick={() => { }}>
-                                        New Chat
-                                    </IonButton>
-                                </div>
-                                <div className={`w-full p-1 ${!messages.length && 'hidden'}`}>
-                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#a943a0] text-white text-lg' onClick={requestForPhoto}>
-                                        Req Photo
-                                    </IonButton>
-                                </div>
+                                {
+                                    [
+                                        { isHidden: !userName && !messages.length, onClick: newConnection, title: "New Chat", className: "bg-[#68b2ff]" },
+                                        { isHidden: !messages.length, onClick: requestForPhoto, title: "Req Photo", className: "bg-[#a943a0]" },
+                                    ].map(({ isHidden, onClick, title, className }) => (
+                                        <div className={`w-full p-1 ${isHidden && 'hidden'}`}>
+                                            <IonButton expand="full" fill="clear" size="large" className={`capitalize rounded-2xl text-white text-lg ${className}`} onClick={onClick}>
+                                                {title}
+                                            </IonButton>
+                                        </div>
+                                    ))
+                                }
                             </div>
 
                             {
@@ -192,10 +193,7 @@ const Chat: React.FC = () => {
                                             itemId='chat-input-box'
                                             placeholder='Enter message...'
                                             value={message}
-                                            onIonChange={(e) => {
-                                                setMessage(e.target.value)
-                                                sendTypingEvent(true)
-                                            }}
+                                            onIonChange={(e) => setMessage(e.target.value)}
                                             onKeyDown={(e) => (e.keyCode === 13) ? sendMessage(e.currentTarget.value) : sendTypingEvent(true)}
                                             slots={(
                                                 <IonButton size='small' fill="clear" slot="end" className='bg-[#68b2ff] my-1 rounded-lg text-white hover:text-black hover:transition duration-300' onClick={() => sendMessage(message)}>

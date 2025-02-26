@@ -40,23 +40,19 @@ function Messages({ messages, handleFileUpload }: { messages: Array<Message>, ha
                             </div>
                             {
                                 isKey && message.text === "photo_request" && (
-                                    isReceiveImage
-                                        ?
-                                        (
-                                            <div className={`my-3 flex items-center ${message.sender ? 'justify-end' : 'justify-start'}`}>
-                                                <p className={`chat-message text-[#0f5999] text-wrap text-sm p-3 rounded-3xl font-semibold text-justify ${message.sender ? 'bg-[#4dacff] rounded-br-md' : 'bg-[#e5f2ff] rounded-bl-md'}`}>
-                                                    <img src={receiveImage} alt="Image" className="rounded-3xl" />
-                                                </p>
+                                    isReceiveImage ? (
+                                        <div className={`my-3 flex items-center ${message.sender ? 'justify-end' : 'justify-start'}`}>
+                                            <p className={`chat-message text-[#0f5999] text-wrap text-sm p-3 rounded-3xl font-semibold text-justify ${message.sender ? 'bg-[#4dacff] rounded-br-md' : 'bg-[#e5f2ff] rounded-bl-md'}`}>
+                                                <img src={receiveImage} alt="Image" className="rounded-3xl" />
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className={`my-3 flex items-center ${message.sender ? 'justify-start' : 'justify-end'}`}>
+                                            <div className={`w-1/2 border-2 border-[#0f5999] rounded-xl ${!message.sender && 'opacity-50'}`}>
+                                                <UploadFiles disabled={!message.sender} onFileUpload={(image) => handleFileUpload(image, message?.id)} maxSize={5} />
                                             </div>
-                                        )
-                                        :
-                                        (
-                                            <div className={`my-3 flex items-center ${message.sender ? 'justify-start' : 'justify-end'}`}>
-                                                <div className={`w-1/2 border-2 border-[#0f5999] rounded-xl ${!message.sender && 'opacity-50'}`}>
-                                                    <UploadFiles disabled={!message.sender} onFileUpload={(image) => handleFileUpload(image, message?.id)} maxSize={5} />
-                                                </div>
-                                            </div>
-                                        )
+                                        </div>
+                                    )
                                 )
                             }
                         </React.Fragment>
