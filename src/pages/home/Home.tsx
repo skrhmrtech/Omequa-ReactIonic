@@ -68,7 +68,7 @@ const Home: React.FC = () => {
                     name="secretCode"
                     label="Secret Code"
                     placeholder="Enter Secret Code"
-                    inputCss={`${formik.touched.secretCode && formik.errors.secretCode && 'border-red-500 border-2'}`}
+                    inputCss={`${formik.touched.secretCode && formik.errors.secretCode && 'border-[red] border-2'}`}
                     value={formik.values.secretCode}
                     onIonChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -90,7 +90,7 @@ const Home: React.FC = () => {
                   {['Male', 'Female'].map((gender, index) => (
                     <IonCol key={index} size="5.5">
                       <IonCard
-                        className={`relative shadow-none flex flex-col items-center p-4 border text-[#61b5ff] rounded-xl cursor-pointer bg-[#f1f8ff] ${formik.touched.gender && formik.errors.gender && 'border-red-500 border-2'} ${formik.values.gender === gender ? "border-[#61b5ff] border-3" : "border-[#93b4d1]"}`}
+                        className={`relative shadow-none flex flex-col items-center p-4 border text-[#61b5ff] rounded-xl cursor-pointer bg-[#f1f8ff] border-solid ${formik.touched.gender && formik.errors.gender && 'border-[red] border-2'} ${formik.values.gender === gender ? "border-[#61b5ff] border-3" : "border-[#93b4d1]"}`}
                         onClick={() => formik.setFieldValue("gender", gender)}
                       >
                         <img src={gender === "Male" ? MaleImage : FemaleImage} alt={gender} className="w-16 h-16 mb-2" />
@@ -107,7 +107,7 @@ const Home: React.FC = () => {
                   name="fullName"
                   label="Full Name"
                   placeholder="Enter your name"
-                  inputCss={`${formik.touched.fullName && formik.errors.fullName && 'border-red-500 border-2'}`}
+                  inputCss={`${formik.touched.fullName && formik.errors.fullName && 'border-[red] border-2'}`}
                   value={formik.values.fullName}
                   onIonChange={formik.handleChange}
                   onBlur={formik.handleBlur}

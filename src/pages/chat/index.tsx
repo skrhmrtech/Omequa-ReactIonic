@@ -137,7 +137,7 @@ const Chat: React.FC = () => {
                                 userName && !chatActive ? (
                                     <div className='h-full flex flex-col justify-center items-center'>
                                         <div className="text-center mb-5 flex flex-col items-center">
-                                            <div className="bg-[#fff6f2] shadow-lg shadow-[#ffc6b2] rounded-full m-5 px-5 py-3 border-2 border-[#ff4a0a] border-b-0">
+                                            <div className="bg-[#fff6f2] shadow-lg shadow-[#ffc6b2] rounded-full m-5 px-5 py-3 border-solid border-2 border-[#ff4a0a] border-b-0">
                                                 <PiLinkBreakBold className="text-[#ff4a0a] text-5xl " />
                                             </div>
                                             <p className="text-[#ff4a0a] mb-3 font-semibold">{userName ?? "User"} is Disconnected</p>

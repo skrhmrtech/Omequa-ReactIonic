@@ -14,9 +14,9 @@ function Header({
 
     return (
         <div className='flex justify-between items-center w-full text-[#0f5999] '>
-            <div className='flex gap-4 items-center'>
+            <div className='flex gap-4 items-center w-60'>
                 {isBack && <IoChevronBackOutline className='text-2xl cursor-pointer' onClick={() => history.goBack()} />}
-                <p className={`text-left w-70 ${isBack ? 'text-2xl' : 'text-3xl'} font-semibold truncate`}>{title}</p>
+                <p className={`text-left w-full ${isBack ? 'text-2xl' : 'text-3xl'} font-semibold truncate`}>{title}</p>
             </div>
             <div className='flex gap-4'>
                 <AiOutlineExclamationCircle className='text-2xl cursor-pointer' />

@@ -48,7 +48,7 @@ function Messages({ messages, handleFileUpload }: { messages: Array<Message>, ha
                                         </div>
                                     ) : (
                                         <div className={`my-3 flex items-center ${message.sender ? 'justify-start' : 'justify-end'}`}>
-                                            <div className={`w-1/2 border-2 border-[#0f5999] rounded-xl ${!message.sender && 'opacity-50'}`}>
+                                            <div className={`w-1/2 border-solid border-2 border-[#0f5999] rounded-xl ${!message.sender && 'opacity-50'}`}>
                                                 <UploadFiles disabled={!message.sender} onFileUpload={(image) => handleFileUpload(image, message?.id)} maxSize={5} />
                                             </div>
                                         </div>

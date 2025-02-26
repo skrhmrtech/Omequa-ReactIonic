@@ -33,7 +33,7 @@ function Input({
     return (
         <div className='w-full'>
             {label && <IonLabel position="stacked" className={`text-[#93b4d1] ${labelCss}`}>{label}</IonLabel>}
-            <IonItem id={itemId} className={`border text-[#93b4d1] rounded-xl bg-gray-100 mb-2 ${inputCss}`}>
+            <IonItem id={itemId} className={`border border-solid text-[#93b4d1] rounded-xl bg-gray-100 mb-2 ${inputCss}`} style={{ "--background": "transparent" }}>
                 <IonInput
                     name={name}
                     placeholder={placeholder}
