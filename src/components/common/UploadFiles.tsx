@@ -5,6 +5,7 @@ import LuUpload from "../../assets/chat/Upload.png";
 interface UploadFilesProps {
     allowedTypes?: string[];
     maxSize?: number;
+    disabled?: boolean;
     onFileUpload: (base64String: string | null) => void;
 }
 
@@ -22,7 +23,7 @@ const defaultType = [
     "image/heic"         // HEIC (Apple's High Efficiency Image Coding)
 ]
 
-const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, maxSize, onFileUpload }) => {
+const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, maxSize, disabled, onFileUpload }) => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +53,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, m
             {/* Hidden file input */}
             <input
                 type="file"
+                disabled={disabled}
                 ref={fileInputRef}
                 accept={allowedTypes.join(", ")}
                 style={{ display: "none" }}
@@ -60,7 +62,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, m
 
             {/* Upload Button */}
             <span
-                className='w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-3 justify-center items-center cursor-pointer'
+                className={`w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-3 justify-center items-center select-none ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
                 onClick={() => fileInputRef.current?.click()}
             >
                 <img src={LuUpload} alt="" className='w-6' />

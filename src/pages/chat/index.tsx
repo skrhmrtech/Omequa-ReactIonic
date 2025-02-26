@@ -36,7 +36,6 @@ const Chat: React.FC = () => {
 
     const [keyboardOpen, setKeyboardOpen] = useState(0);
     const [chatActive, setChatActive] = useState(false);
-    const [inputBoxActive, setInputBoxActive] = useState(false);
     const [userLeave, setUserLeave] = useState(false);
     const [userName, setUserName] = useState(null);
     const [message, setMessage] = useState('');
@@ -72,7 +71,6 @@ const Chat: React.FC = () => {
         setChatActive(isConnect);
         setUserLeave(!isConnect);
         isConnect && setUserName(null);
-        setInputBoxActive(false);
         setMessages([]);
     }
 
@@ -96,7 +94,7 @@ const Chat: React.FC = () => {
     const handleTyping = (typing: boolean) => {
         setIsTyping(typing);
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-        if (typing) typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+        if (typing) typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 1000);
     };
 
     const updateImage = (id: string, image: string) => {
@@ -124,7 +122,6 @@ const Chat: React.FC = () => {
         if (!(image && id && ws.current?.readyState === WebSocket.OPEN)) return;
         ws.current.send(JSON.stringify({ type: 'text', message: JSON.stringify({ text: null, fullName, receiveImage: image, id }) }));
         updateImage(id, image);
-        !userLeave && !inputBoxActive && messages.length && setInputBoxActive(true)
     }
 
     return (
@@ -161,30 +158,26 @@ const Chat: React.FC = () => {
                         </IonCol>
 
                         {/* Bottom Section */}
-                        <div className={`h-[${!userLeave && chatActive && inputBoxActive ? '22.5%' : '12.5%'}] flex flex-col justify-start pt-2`} >
+                        <div className={`h-[${!userLeave && chatActive ? '22.5%' : '12.5%'}] flex flex-col justify-start pt-2 ${!messages.length && 'pb-5'}`} >
                             <div className='w-full text-center mb-2'>
                                 {
                                     userName && userLeave ? (
                                         <span className="text-[#0f5999] text-sm bg-[#edf6ff] p-2 rounded-md cursor-pointer" onClick={() => { history.replace('/') }}>Go to Home</span>
-                                    ) : chatActive && inputBoxActive && messages.length && userName ? (
-                                        <div className='w-[50%] mx-auto'>
-                                            <UploadFiles onFileUpload={handleUploadImage} maxSize={5} />
-                                        </div>
                                     ) : (!messages.length && !userName) ? (
-                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Waiting for connection</p>
+                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">Waiting for connection</p>
                                     ) : (
-                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md">Connected to {userName ?? "User"}</p>
+                                        <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">Connected to {userName ?? "User"}</p>
                                     )
                                 }
                             </div>
 
-                            <div className={`flex w-full ${!inputBoxActive && 'pb-3'}`}>
-                                <div className='w-full p-1'>
-                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#68b2ff] text-white text-lg' onClick={() => { !userLeave && messages.length && setInputBoxActive(true) }}>
+                            <div className={`flex w-full`}>
+                                <div className={`w-full p-1 ${!userName && !messages.length && 'hidden'}`}>
+                                    <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#68b2ff] text-white text-lg' onClick={() => { }}>
                                         New Chat
                                     </IonButton>
                                 </div>
-                                <div className={`w-full p-1 ${!inputBoxActive && 'hidden'}`}>
+                                <div className={`w-full p-1 ${!messages.length && 'hidden'}`}>
                                     <IonButton expand="full" fill="clear" size="large" className='capitalize rounded-2xl bg-[#a943a0] text-white text-lg' onClick={requestForPhoto}>
                                         Req Photo
                                     </IonButton>
@@ -192,7 +185,7 @@ const Chat: React.FC = () => {
                             </div>
 
                             {
-                                !userLeave && chatActive && inputBoxActive && (
+                                !userLeave && chatActive && Boolean(messages.length) && (
                                     <div className='flex w-full p-1'>
                                         <Input
                                             name='message'
