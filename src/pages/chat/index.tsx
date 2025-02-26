@@ -35,7 +35,6 @@ const Chat: React.FC = () => {
 
     const [keyboardOpen, setKeyboardOpen] = useState(0);
     const [chatActive, setChatActive] = useState(false);
-    const [userLeave, setUserLeave] = useState(false);
     const [userName, setUserName] = useState(null);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState<Array<Message>>([]);
@@ -67,7 +66,6 @@ const Chat: React.FC = () => {
 
     const handleConnectLeave = (isConnect: boolean) => {
         setChatActive(isConnect);
-        setUserLeave(!isConnect);
         isConnect && setUserName(null);
         setMessages([]);
     }
@@ -113,7 +111,7 @@ const Chat: React.FC = () => {
         callback(...callbackParams);
     };
 
-    const newConnection = () => sendSpecificMessage({ isConnectionLost: true }, connectWebSocket);
+    const newConnection = () => !chatActive ? connectWebSocket() : sendSpecificMessage({ isConnectionLost: true }, connectWebSocket);
 
     const sendTypingEvent = (isTyping: boolean) => sendSpecificMessage({ isTyping });
 
@@ -136,7 +134,7 @@ const Chat: React.FC = () => {
                         {/* Message Section */}
                         <IonCol className="flex-grow overflow-y-auto select-text">
                             {
-                                userName && userLeave ? (
+                                userName && !chatActive ? (
                                     <div className='h-full flex flex-col justify-center items-center'>
                                         <div className="text-center mb-5 flex flex-col items-center">
                                             <div className="bg-[#fff6f2] shadow-lg shadow-[#ffc6b2] rounded-full m-5 px-5 py-3 border-2 border-[#ff4a0a] border-b-0">
@@ -157,10 +155,10 @@ const Chat: React.FC = () => {
                         </IonCol>
 
                         {/* Bottom Section */}
-                        <div className={`h-[${!userLeave && chatActive ? '22.5%' : '12.5%'}] flex flex-col justify-start pt-2 ${!messages.length && 'pb-5'}`} >
+                        <div className={`h-[${chatActive ? '22.5%' : '12.5%'}] flex flex-col justify-start pt-2 ${!messages.length && 'pb-5'}`} >
                             <div className='w-full text-center mb-2'>
                                 {
-                                    userName && userLeave ? (
+                                    userName && !chatActive ? (
                                         <span className="text-[#0f5999] text-sm bg-[#edf6ff] p-2 rounded-md cursor-pointer font-bold" onClick={() => history.replace('/')}>Go to Home</span>
                                     ) : (
                                         <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">
@@ -186,7 +184,7 @@ const Chat: React.FC = () => {
                             </div>
 
                             {
-                                !userLeave && chatActive && Boolean(messages.length) && (
+                                chatActive && Boolean(messages.length) && (
                                     <div className='flex w-full p-1'>
                                         <Input
                                             name='message'
