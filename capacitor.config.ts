@@ -24,6 +24,11 @@ const config: CapacitorConfig = {
       layoutName: "launch_screen",
       useDialog: true,
     },
+    StatusBar: {
+      style: "light",
+      backgroundColor: "transparent",
+      overlays: true,
+    },
   },
 };
 

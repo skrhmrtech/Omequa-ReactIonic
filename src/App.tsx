@@ -38,12 +38,23 @@ import './theme/variables.css';
 
 import { Toaster } from 'react-hot-toast';
 
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
+
 setupIonicReact();
 
 const App: React.FC = () => {
 
   // Set the global title
   React.useEffect(() => { document.title = "Omequa" }, []);
+
+  React.useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      StatusBar.setOverlaysWebView({ overlay: true });
+      StatusBar.setBackgroundColor({ color: 'transparent' });
+      StatusBar.setStyle({ style: Style.Light });
+    }
+  }, []);
 
   return (
     <IonApp>
