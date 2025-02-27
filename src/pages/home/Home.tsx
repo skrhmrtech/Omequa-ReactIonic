@@ -54,7 +54,7 @@ const Home: React.FC = () => {
     <IonPage>
       <IonContent className="select-none flex flex-col h-full" fullscreen>
         <IonGrid className="w-full h-full flex justify-center">
-          <IonRow className="w-full max-w-md px-5 flex flex-col h-full">
+          <IonRow className="w-full max-w-lg px-5 flex flex-col h-full">
             <div className="min-h-[10%] flex items-end py-2 pt-5">
               <Header title="Omequa" />
             </div>
