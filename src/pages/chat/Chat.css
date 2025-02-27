@@ -3,7 +3,6 @@
   overflow-wrap: break-word;
   white-space: pre-wrap;
   text-wrap: wrap !important;
-  max-width: 100%;
 }
 
 #chat-input-box {

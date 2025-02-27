@@ -60,7 +60,7 @@ const Home: React.FC = () => {
             </div>
 
             {/* Form Section */}
-            <IonCol className="flex-grow overflow-y-auto">
+            <IonCol className="flex-grow overflow-y-auto overflow-x-hidden">
               <form onSubmit={formik.handleSubmit} className="h-full flex flex-col justify-evenly">
                 <div>
                   {/* Secret Code Input */}

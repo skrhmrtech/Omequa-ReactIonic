@@ -122,7 +122,7 @@ const Chat: React.FC = () => {
                         </div>
 
                         {/* Message Section */}
-                        <IonCol className="flex-grow overflow-y-auto select-text">
+                        <IonCol className="flex-grow overflow-y-auto overflow-x-hidden select-text">
                             {
                                 userName && !chatActive ? (
                                     <div className='h-full flex flex-col justify-center items-center'>

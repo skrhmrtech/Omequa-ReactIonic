@@ -63,7 +63,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <IonApp className='min-w-[350px] min-h-[450px] overflow-auto' style={{ height: `calc(100vh - ${keyboardOpen}px)` }}>
+    <IonApp className='min-w-[350px] min-h-[450px] overflow-auto' style={{ height: `calc(100dvh - ${keyboardOpen}px` }}>
       <Toaster position="top-center" />
       <IonReactRouter>
         <IonRouterOutlet>
