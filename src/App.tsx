@@ -38,18 +38,24 @@ import './theme/variables.css';
 
 import { Toaster } from 'react-hot-toast';
 
-import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Keyboard } from '@capacitor/keyboard';
 
 setupIonicReact();
 
 const App: React.FC = () => {
+
+  const [keyboardOpen, setKeyboardOpen] = React.useState(0);
 
   // Set the global title
   React.useEffect(() => { document.title = "Omequa" }, []);
 
   React.useEffect(() => {
     if (Capacitor.isNativePlatform()) {
+      Keyboard.addListener('keyboardDidShow', (info) => setKeyboardOpen(info?.keyboardHeight - 50));
+      Keyboard.addListener('keyboardDidHide', () => setKeyboardOpen(0));
+
       StatusBar.setOverlaysWebView({ overlay: true });
       StatusBar.setBackgroundColor({ color: 'transparent' });
       StatusBar.setStyle({ style: Style.Light });
@@ -57,7 +63,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <IonApp>
+    <IonApp className='min-w-[350px] min-h-[450px] overflow-auto' style={{ height: `calc(100vh - ${keyboardOpen}px)` }}>
       <Toaster position="top-center" />
       <IonReactRouter>
         <IonRouterOutlet>

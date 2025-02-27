@@ -8,8 +8,6 @@ import {
     IonRow,
     IonCol,
 } from '@ionic/react';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
 
 import { PiLinkBreakBold } from "react-icons/pi";
 import RiSendPlaneFill from "../../assets/chat/Chat.png";
@@ -33,7 +31,6 @@ const Chat: React.FC = () => {
     const ws = useRef<WebSocket | null>(null);
     const { secretCode, fullName, gender } = useLocation<{ secretCode: string; fullName: string; gender: string }>()?.state || {};
 
-    const [keyboardOpen, setKeyboardOpen] = useState(0);
     const [chatActive, setChatActive] = useState(false);
     const [userName, setUserName] = useState(null);
     const [message, setMessage] = useState('');
@@ -55,14 +52,7 @@ const Chat: React.FC = () => {
     }, [secretCode, fullName, gender]);
 
     useEffect(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), [messages, isTyping]);
-
-    useEffect(() => {
-        if (Capacitor.isNativePlatform()) {
-            Keyboard.addListener('keyboardDidShow', (info) => setKeyboardOpen(info?.keyboardHeight - 50));
-            Keyboard.addListener('keyboardDidHide', () => setKeyboardOpen(0));
-        }
-        return () => { typingTimeoutRef.current && clearTimeout(typingTimeoutRef.current) };
-    }, []);
+    useEffect(() => { typingTimeoutRef.current && clearTimeout(typingTimeoutRef.current) }, []);
 
     const handleConnectLeave = (isConnect: boolean) => {
         setChatActive(isConnect);
@@ -122,12 +112,12 @@ const Chat: React.FC = () => {
     }
 
     return (
-        <IonPage className='min-w-[350px] min-h-[550px] overflow-auto h-screen'>
-            <IonContent className="select-none flex flex-col h-full" style={{ backgroundColor: "#ffffff" }} fullscreen>
-                <IonGrid className="w-full h-full flex justify-center" style={{ height: `calc(100vh - ${keyboardOpen}px)` }}>
+        <IonPage>
+            <IonContent className="select-none flex flex-col h-full" fullscreen>
+                <IonGrid className="w-full h-full flex justify-center">
                     <IonRow className="w-full max-w-md px-5 flex flex-col h-full">
                         {/* Header Section */}
-                        <div className="min-h-[10%] flex items-end py-2">
+                        <div className="min-h-[10%] flex items-end py-2 pt-5">
                             <Header title={userName ?? "User"} isBack={true} />
                         </div>
 
