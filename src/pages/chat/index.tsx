@@ -122,12 +122,12 @@ const Chat: React.FC = () => {
     }
 
     return (
-        <IonPage>
+        <IonPage className='min-w-[350px] min-h-[550px] overflow-auto h-screen'>
             <IonContent className="select-none flex flex-col h-full" style={{ backgroundColor: "#ffffff" }} fullscreen>
                 <IonGrid className="w-full h-full flex justify-center" style={{ height: `calc(100vh - ${keyboardOpen}px)` }}>
                     <IonRow className="w-full max-w-md px-5 flex flex-col h-full">
                         {/* Header Section */}
-                        <div className="h-[10%] flex items-end pb-2">
+                        <div className="min-h-[10%] flex items-end py-2">
                             <Header title={userName ?? "User"} isBack={true} />
                         </div>
 
@@ -155,7 +155,7 @@ const Chat: React.FC = () => {
                         </IonCol>
 
                         {/* Bottom Section */}
-                        <div className={`h-[${chatActive ? '22.5%' : '12.5%'}] flex flex-col justify-start pt-2 ${!messages.length && 'pb-5'}`} >
+                        <div className={`min-h-[15%] flex flex-col justify-start py-2 ${!messages.length && !userName && 'py-5'}`} >
                             <div className='w-full text-center mb-2'>
                                 {
                                     userName && !chatActive ? (
@@ -174,7 +174,7 @@ const Chat: React.FC = () => {
                                         { isHidden: !userName && !messages.length, onClick: newConnection, title: "New Chat", className: "bg-[#68b2ff]" },
                                         { isHidden: !messages.length, onClick: requestForPhoto, title: "Req Photo", className: "bg-[#a943a0]" },
                                     ].map(({ isHidden, onClick, title, className }) => (
-                                        <div className={`w-full p-1 ${isHidden && 'hidden'}`}>
+                                        <div className={`w-full p-1 ${isHidden && 'hidden'}`} key={title}>
                                             <IonButton expand="full" fill="clear" size="large" className={`capitalize rounded-2xl text-white text-lg ${className}`} onClick={onClick}>
                                                 {title}
                                             </IonButton>

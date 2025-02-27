@@ -62,11 +62,11 @@ const UploadFiles: React.FC<UploadFilesProps> = ({ allowedTypes = defaultType, m
 
             {/* Upload Button */}
             <span
-                className={`w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-3 justify-center items-center select-none ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+                className={`w-full text-[#0f5999] text-sm bg-[#edf6ff] px-2 py-2.5 rounded-xl flex gap-3 justify-center items-center text-center select-none ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
                 onClick={() => fileInputRef.current?.click()}
             >
                 <img src={LuUpload} alt="" className='w-6' />
-                Upload Photo
+                <span>Upload Photo</span>
             </span>
         </React.Fragment>
     );

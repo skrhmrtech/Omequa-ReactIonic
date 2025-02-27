@@ -51,11 +51,11 @@ const Home: React.FC = () => {
   const copyText = () => copyToClipboard(formik.values.secretCode);
 
   return (
-    <IonPage>
+    <IonPage className='min-w-[350px] min-h-[550px] overflow-auto'>
       <IonContent className="select-none flex flex-col h-full" style={{ backgroundColor: "#ffffff" }} fullscreen>
         <IonGrid className="w-full h-full flex justify-center">
           <IonRow className="w-full max-w-md px-5 flex flex-col h-full">
-            <div className="h-[10%] flex items-end pb-2">
+            <div className="min-h-[10%] flex items-end py-2">
               <Header title="Omequa" />
             </div>
 
@@ -123,7 +123,7 @@ const Home: React.FC = () => {
             </IonCol>
 
             {/* Bottom Section */}
-            <div className="h-[15%] flex flex-col justify-start pt-2">
+            <div className="min-h-[15%] flex flex-col justify-start py-2">
               <div className='w-full text-center mb-2'>
                 <span className="text-[#a943a0] text-sm bg-[#f2e3f1] p-1 rounded-md">245 Online Users</span>
               </div>
