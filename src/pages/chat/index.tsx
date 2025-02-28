@@ -7,7 +7,10 @@ import {
     IonGrid,
     IonRow,
     IonCol,
+    IonSpinner,
 } from '@ionic/react';
+
+import { Oval } from "react-loader-spinner";
 
 import { PiLinkBreakBold } from "react-icons/pi";
 import RiSendPlaneFill from "../../assets/chat/Chat.png";
@@ -118,7 +121,7 @@ const Chat: React.FC = () => {
                     <IonRow className="w-full max-w-lg px-5 flex flex-col h-full">
                         {/* Header Section */}
                         <div className="min-h-[10%] flex items-end py-2 pt-5">
-                            <Header title={userName ?? "User"} isBack={true} />
+                            <Header title={userName ?? "User"} isBack={true} onBack={() => { newConnection(); history.goBack() }} />
                         </div>
 
                         {/* Message Section */}
@@ -135,11 +138,26 @@ const Chat: React.FC = () => {
                                         <Investors />
                                     </div>
                                 ) : (
-                                    <div className='mt-3 p-1'>
-                                        {chatActive && <Messages messages={messages} handleFileUpload={handleRequestedPhotoUpload} />}
-                                        {isTyping && <TypingIndicator />}
-                                        <div ref={chatEndRef} />
-                                    </div>
+                                    !messages.length && !userName ? (
+                                        <>
+                                            <div className='h-full flex items-center justify-center gap-2'>
+                                                <Oval
+                                                    visible={true}
+                                                    height="100"
+                                                    width="100"
+                                                    strokeWidth={3}
+                                                    color="#0f5999"
+                                                    secondaryColor="#4dacff"
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className='mt-3 p-1'>
+                                            {chatActive && <Messages messages={messages} handleFileUpload={handleRequestedPhotoUpload} />}
+                                            {isTyping && <TypingIndicator />}
+                                            <div ref={chatEndRef} />
+                                        </div>
+                                    )
                                 )
                             }
                         </IonCol>
@@ -152,7 +170,14 @@ const Chat: React.FC = () => {
                                         <span className="text-[#0f5999] text-sm bg-[#edf6ff] p-2 rounded-md cursor-pointer font-bold" onClick={() => history.replace('/')}>Go to Home</span>
                                     ) : (
                                         <p className="text-[#0f5999] text-sm bg-[#edf6ff] p-1 rounded-md font-bold">
-                                            {!messages.length && !userName ? 'Waiting for connection' : `Connected to ${userName ?? "User"}`}
+                                            {!messages.length && !userName ? (
+                                                <>
+                                                    <div className='flex items-center justify-center gap-2'>
+                                                        <IonSpinner name="circles" color="secondary" />
+                                                        Waiting for connection
+                                                    </div>
+                                                </>
+                                            ) : `Connected to ${userName ?? "User"}`}
                                         </p>
                                     )
                                 }

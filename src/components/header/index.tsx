@@ -6,16 +6,18 @@ import TbMessageCircleStar from "../../assets/home/Query.png";
 function Header({
     title,
     isBack = false,
+    onBack = () => { },
 }: {
     title: string,
     isBack?: boolean
+    onBack?: () => void
 }) {
     const history = useHistory();
 
     return (
         <div className='flex justify-between items-center w-full text-[#0f5999] '>
             <div className='flex gap-4 items-center w-60'>
-                {isBack && <IoChevronBackOutline className='text-2xl cursor-pointer' onClick={() => history.goBack()} />}
+                {isBack && <IoChevronBackOutline className='text-2xl cursor-pointer' onClick={() => onBack ? onBack() : history.goBack()} />}
                 <p className={`text-left w-full ${isBack ? 'text-2xl' : 'text-3xl'} font-semibold truncate`}>{title}</p>
             </div>
             <div className='flex gap-4'>
